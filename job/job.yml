@@ -1,0 +1,14 @@
+apiVersion: batch/v1 
+kind: Job
+metadata:
+name: math-add-job 
+spec:
+  completions: 3 # to create 3 instance of pod
+  parallelism: 3 # instead pods created sequentially we can get them created in parallel               
+  template:
+   spec:
+       containers:
+       - name: math-add
+         image: ubuntu
+         command: ['expr', '3', ‘+', ‘2’]
+       restartPolicy: Never # not restart after finished in this case

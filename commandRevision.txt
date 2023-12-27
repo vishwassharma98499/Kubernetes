@@ -1,0 +1,173 @@
+read security context : as admin user value 0 for user , applied on container or pod level
+only sh no bin/sh while running command from a job
+
+node selector for pod is nodeSelector:
+    kubernetes.io/hostname: controlplane
+
+kubectl explain pod.spec (practice the command to get to know syntax)
+linux network virtualization cloud
+
+linux linecount
+find /path-name "dir-name-here"
+:set nu # line number in vi editor
+
+Alias k=kubectl
+k get all --all-namespaces
+ 
+kubectl get pods --selector app=App1
+
+K create deploy vd --image=nginx
+kubectl set image deploy vd nginx=nginx:1.9.1
+
+kubectl rollout status deployment/myapp-deployment
+kubectl rollout history deployment/myapp-deployment
+ 
+kubectl exec -it my-kubernetes-dashboard ls /var/run/secrets/kubernetes.io/serviceaccount
+kubectl exec -it busybox -c busybox2 # connect busybox container in pod
+kubectl expose pod redis --port=6379 --name redis-service
+
+--expose in the end of create to expose the service by default
+
+kubectl exec ubuntu-sleeper -- whoami and check the user that is running the container.
+
+
+kubectl set image deployment/myapp-deployment \ nginx=nginx:1.9.1
+ 
+ kubectl top pod/node # to identify cpu n memory consumption
+
+k exec -it podname -- sh # to go inside pod
+sh shell command
+ command: ["/bin/sh","-c", "wget -O /work-dir/index.html http://neverssl.com/online"]  -c is must to pass argument code as string
+
+k get pod --show-labels
+DEPLOYMENT:
+
+Strategy: Rollout : RecreateStrategy,RollingUpdate(default)
+
+When Kubernetes is initially configured it creates an internal private network with the address 10.244.0.0 and all PODs are attached to it. When you deploy multiple PODs, they all get a separate IP assigned. The PODs can communicate to each other through this IP
+
+SERVICE:
+
+ NodePort were the service makes an internal POD accessible on a Port on the Node. The second is ClusterIP – and in this case the service creates a virtual IP inside the cluster to enable communication between different services such as a set of front-end servers to a set of backend- servers. The third type is a LoadBalancer, were it provisions a load balancer for our service in supported cloud providers. A good example of that would be to distribute load across different web server
+
+there are 3 ports involved. The port on the POD were the actual web server is running is port 80. And it is referred to as the targetPort, because that is were the service forwards the requests to. The second port is the port on the service itself. It is simply referred to as the port. Remember, these terms are from the viewpoint of the service. The service is in fact like a virtual server inside the node. Inside the cluster it has its own IP address. And that IP address is called the Cluster-IP of the service. And finally we have the port on the Node itself which we use to access the web server externally. And that is known as the NodePort. As you can see it is 30008. That is because NodePorts can only be in a valid range which is from 30000 to 32767.
+
+n. The first type of port is the targetPort, which we will set to 80. The next one is simply port, which is the port on the service object and we will set that to 80 as well. The third is NodePort which we will set to 30008 or any number in the valid range. Remember that out of these, the only mandatory field is port . If you don’t provide a targetPort it is assumed to be the same as port and if you don’t provide a nodePort a free port in the valid range between 30000 and 32767 is automatically allocated. Also note that ports is an array.
+98
+30008
+10.106.1.12 80
+So note the dash under the ports section that indicate the first element in the array. You can have multiple such port mappings within a single service.
+
+Under the selector provide a list of labels to identify the POD. For this refer to the pod- definition file used to create the POD. Pull the labels from the pod-definition file and place it under the selector section. This links the service to the pod.
+
+ Each service gets an IP and name assigned to it inside the cluster and that is the name that should be used by other PODs to access the service. This type of service is known as ClusterIP.
+
+ ENV is an array. So every item under the env property starts with a dash, indicating an item in the array. Each item has a name and a value property. The name is the name of the environment variable made available within the container and the value is its value
+
+kubectl create configmap <config-name> --from-literal=<key>=<value>
+
+kubectl create secret generic <secret-name> --from-literal=<key>=<value>
+
+ echo –n ‘mysql’ | base64
+
+
+So when a service account is created, it first creates the service account object and then generates a token for the service account. It then creates a secret object and stores that token inside the secret object. The secret object is then linked to the service account. To view the token, view the secret object by running the command kubectl describe secret
+
+. The secret token is mounted at location /var/run/secrets/kubernetes.io/serviceaccount inside the pod. So from inside the pod if you run the ls command
+
+ 
+kubectl exec -it my-kubernetes-dashboard ls /var/run/secrets/kubernetes.io/serviceaccount
+
+r, you cannot edit the service account of an existing pod, so you must delete and re-create the pod. However in case of a deployment, you will be able to edit the serviceAccount, as any changes to the pod definition will automatically trigger a new roll-out for the deployment.
+
+
+Replicates does not delete pods on edited like deploy
+
+k expose --help
+Expose a resource as a new Kubernetes service.
+
+Job- completion and  restart policy
+Cronjob- schedule periodically
+
+solution you deploy is called as an Ingress Controller. And the set of rules you configure is called as Ingress Resources. Ingress resources are created using definition files like the ones we used to create PODs, Deployments and services earlier in this course
+ activedeadlineseconds: for task to remaon active before fail
+CronJob is meant for performing regular scheduled actions such as backups, report generation, and so on
+ Persistent Volume is a Cluster wide pool of storage volumes configured by an Administrator, to be used by users deploying applications on the cluster. The users can now select storage from this pool using Persistent Volume Claims\
+
+ n the previous lecture we created a Persistent Volume. Now we will create a Persistent Volume Claim to make the storage available to a node.
+Persistent Volumes and Persistent Volume Claims are two separate objects in the Kubernetes namespace. An Administrator creates a set of Persistent Volumes and a user creates Persistent Volume Claims to use the storage. Once the Persistent Volume Claims are created, Kubernetes binds the Persistent Volumes to Claims based on the request and properties set on the volume
+Every Persistent Volume Claim is bound to a single Persistent volume
+
+Local volumes do not currently support dynamic provisioning, however a StorageClass should still be created to delay volume binding until Pod scheduling. This is specified by the WaitForFirstConsumer volume binding mode
+emptyDir: {} for volume define local
+> command to write output in file
+
+put env value in "" always
+
+# expose the deployment for service
+kubectl expose deployment redis --port=6379 --name messaging-service --namespace marketing
+
+kubectl logs e-com-1123 --namespace e-commerce > /opt/outputs/e-com-1123.logs to export logsS
+kubectl logs nginx --previous # previous pod logs
+
+kubectl run podname --image=imagename -l label=value # to set the label
+
+k delete pod -l label=value #to delete pod with the label given
+
+alias kn='kubectl config set-context --current --namespace '
+kn default
+
+kubectl config view  (to see users available or context in current config)
+kubectl config --kubeconfig=/root/my-kube-config current-context (to change context also in file by path)
+
+kubectl run busybox --image=busybox --command --restart=Never
+kubectl run nginx1 --image=nginx --restart=Never --labels=app=v1
+kubectl get po --show-labels
+annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: / for ingress is must and port for pod is 8080
+
+
+
+Documentations:
+
+kubectl proxy --port=8080 & locating the API server and authenticating.
+Then you can explore the API with curl, wget, or a browser, like so:
+curl http://localhost:8080/api/
+
+
+--all-namespaces to get resource in all namespaces available(-A)
+k create quota for resource quota
+
+
+
+Revision:
+
+k run name --image image -- expose --port 1010 to create pod and expose it
+
+service account location in pod mount path volume
+
+Operators 
+logical operators that you can use in the operator field for nodeAffinity and podAffinity 
+In	The label value is present in the supplied set of strings
+NotIn	The label value is not contained in the supplied set of strings
+Exists	A label with this key exists on the object
+DoesNotExist	No label with this key exists on the object
+
+k get pod -l env : label selector with label env
+
+kube-system namespace for settings, roles and assign user get rolebinding
+root/.kube/configfile contains user settings and permission and current user
+
+kubectl get pods --as dev-user for specific user instead of current user
+clusterrole are not part of any namespace
+
+After that test the access using the command kubectl auth can-i list storageclasses --as michelle.
+
+to check process ps -ef | grep kube-apiserver | grep admission-plugins
+
+kubectl run httpd --image=httpd:alpine --port=80 --expose
+
+Use envFrom to define all of the Secret's data as container environment variables. The key from the Secret becomes the environment variable name in the Pod
+
+kubectl top pod --sort-by='memory' --no-headers | head 
+job.backoffLimit: 15 # This is so the job does not quit before it succeeds.Specifies the number of retries before marking this job failed. Defaults to 6

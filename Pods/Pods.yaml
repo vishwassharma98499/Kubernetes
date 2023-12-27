@@ -3,9 +3,98 @@ kind: Pod
 metadata:
    name: nginx-2
    labels:
-      app: myapp
+      app: myapp   
+   annotations:
+     buildversion: "1.34" #annotations are used to record other details for informatory purpose (name ,version)
 spec:
+   securityContext:
+    runAsUser: 1000 #can ve set on pod and container both
    containers:
     - name: nginx
       image: nginx
-      
+      securityContext:
+       runAsUser: 1000 
+       capabilities:
+        add: ["MAC_ADMIN","SYSKEY"] #can be container only
+      readinessProbe: # check conrainer is ready or not
+        httpGet:
+          path: /api/ready # execute a command within the container to run a custom script that would exit successfully if the application is ready.
+          port: 8080
+        exec:
+          command: #execute a command
+          - cat
+          - /app/is_ready
+        tcpSocket:
+          port: 3306 #use the tcpSocket option with port
+                
+        #additional commands
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 8
+      livenessProbe: #check heakth of pod by running test
+        httpGet:
+          path: /api/healthy 
+          port: 8080
+
+      ports:
+        - containerPort: 8080 # container exposirn port
+      env:
+        - name: Appcolor
+          value: pink
+        - name: Appcolor
+          valueFrom:
+            configMapKeyRef:
+              name: PathToconfigmapContainsAppcolorpink
+              key: Appcolor
+        - name: secrettyp
+          valueFrom:
+            secretKeyRef:
+              key: keyyy
+      resources:
+        requests: # to ask for resources
+           memory: "1Gi"
+           cpu: 1
+        limits:  # default limit up to that resource can be consumed
+          memory: “2Gi" 
+          cpu: 2
+      envFrom:
+      - secretRef:
+          name: app-secret
+      command: ["sleep"] #["--color","green"] for multiple args
+      args: ["10"]
+
+    - name: log-agent # multicontainer  pod
+      image: log-agent
+      volumeMounts:
+       - mountPath: /opt #mount the data-volume to the directory /opt within the container.
+         name: data-volume      
+   volumes:
+      - name: app-config-volume
+        configMap:
+          name: app-config   
+      -  name: data-volume
+         hostPath: 
+           path: /data
+           type: Directory #y files created in the volume would be stored in the directory data on my node.
+           # once the volume is created, to access it from a container we mount the volume to a directory inside the container. 
+           # We use the volumeMounts field in each container to mount the data-volume to the directory /opt within the container
+   
+   serviceAccount: dashboard-sa # use to get tokens to access the pod #automountServiceAccountToken: false to not allow kubernetes to mount default service account
+    # kubectl taint nodes node-name key=value:taint-effect NoSchedule | PreferNoSchedule | NoExecute
+   tolerations: # taint the node using taunt and assihn toleration to pod    
+   - key: ""
+     operator: “Equal” 
+     value: “ ”
+     effect: ""
+    # kubectl label nodes node-1 size=Large
+   nodeSelector: 
+     size: Large
+   affinity:
+     nodeAffinity:
+       requiredDuringSchedulingIgnoredDuringExecution: #preferredDuringSchedulingIgnoredDuringExecution
+         nodeSelectorTerms:
+         - matchExpressions:
+           - key: size 
+             operator: In # Exists
+             values: 
+             - Large
